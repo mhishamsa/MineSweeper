@@ -64,7 +64,7 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>mine2.ico</ApplicationIcon>
+    <ApplicationIcon>MineWithOutline.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -182,9 +182,16 @@
     <Resource Include="MinesweeperIcons\smiley1.ico" />
     <Resource Include="MinesweeperIcons\smiley2.ico" />
     <Resource Include="MinesweeperIcons\smiley3.ico" />
-    <Resource Include="MinesweeperIcons\tile.ico" />
     <Resource Include="MinesweeperIcons\tile2.ico" />
     <Resource Include="MinesweeperIcons\tile3.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="MinesweeperIcons\flagDark.ico" />
+    <Resource Include="MinesweeperIcons\tile.ico" />
+    <Resource Include="MinesweeperIcons\tileDark.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="MineWithOutline.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
