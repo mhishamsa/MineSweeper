@@ -170,9 +170,6 @@
     <Resource Include="Images\Numbers\Number-1-icon.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="mine2.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="MinesweeperIcons\flag.ico" />
     <Resource Include="MinesweeperIcons\mine.ico" />
     <Resource Include="MinesweeperIcons\mine2.ico" />
