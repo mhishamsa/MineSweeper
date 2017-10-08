@@ -3,7 +3,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
@@ -16,6 +15,7 @@ namespace MineSweeper
     {
         MineField MineField;
         DispatcherTimer timer = new DispatcherTimer();
+        bool GameStarted;
 
         public MainWindow()
         {
@@ -35,6 +35,8 @@ namespace MineSweeper
             }
             else
             {
+                GameStarted = false;
+                SetImageToButton(Start_Button, "../MinesweeperIcons/smiley1.ico");
                 Error_Message.Text = "";
                 MineField = new MineField("Just Another Random Miner!", Convert.ToInt32(Rows_Value.Text), Convert.ToInt32(Cols_Value.Text), Convert.ToInt32(Mines_Value.Text));
                 Remaining_Value.Text = MineField.Mines.ToString();
@@ -46,7 +48,7 @@ namespace MineSweeper
                 timer = new DispatcherTimer();
                 timer.Interval = TimeSpan.FromSeconds(1);
                 timer.Tick += Timer_Tick;
-                timer.Start();
+                //timer.Start();
 
                 FieldGrid.RowDefinitions.Clear();
                 FieldGrid.ColumnDefinitions.Clear();
@@ -68,11 +70,12 @@ namespace MineSweeper
                         }
                         CellButton.Name = "X" + i + "X" + j + "X";              //Name format for buttons will be "XRowXColumnX"
                         FieldGrid.RegisterName(CellButton.Name, CellButton);
+                        CellButton.MouseLeftButtonUp += new MouseButtonEventHandler(ToggleButton_MouseLeftButtonUp);
                         CellButton.MouseRightButtonDown += new MouseButtonEventHandler(ToggleButton_MouseRightButtonDown);
                         CellButton.Checked += new RoutedEventHandler(ToggleButton_Checked);
                         CellButton.SetValue(Grid.RowProperty, i);
                         CellButton.SetValue(Grid.ColumnProperty, j);
-                        SetImageToButton(CellButton, "../MinesweeperIcons/tileDark.ico");
+                        //SetImageToButton(CellButton, "../MinesweeperIcons/tileDark.ico");
                         CellButton.Width = 25;
                         CellButton.Height = 25;
                         FieldGrid.Children.Add(CellButton);
@@ -84,21 +87,31 @@ namespace MineSweeper
         private void TextBox_Value_TextChanged(object sender, TextChangedEventArgs e)
         {
             int num;
-            string previousText = "";
             bool success = int.TryParse(((TextBox)sender).Text, out num);
             if (((TextBox)sender).Name == "Mines_Value")
             {
-                if (success)
-                    previousText = ((TextBox)sender).Text;
-                else
-                    ((TextBox)sender).Text = previousText;
+                if (!success)
+                {
+                    ((TextBox)sender).Text = "";
+                }
             }
             else
             {
-                if (success && num <= 30)
-                    previousText = ((TextBox)sender).Text;
+                if (success)
+                {
+                    if(num > 30)
+                    {
+                        ((TextBox)sender).Text = "30";
+                    }
+                    if(num < 2)
+                    {
+                        ((TextBox)sender).Text = "2";
+                    }
+                }
                 else
-                    ((TextBox)sender).Text = previousText;
+                {
+                    ((TextBox)sender).Text = "";
+                }
             }
         }
 
@@ -114,13 +127,21 @@ namespace MineSweeper
             int i = int.Parse(tokens[1]);
             int j = int.Parse(tokens[2]);
 
+            if (!GameStarted)
+            {
+                timer.Start();
+                MineField.RandomizeMines(MineField.Field[i, j]);
+                MineField.CountCellMines();
+                GameStarted = true;
+            }
+
             if (!MineField.Field[i, j].Flagged)
             {
                 if (MineField.Field[i, j].Mine)
                 {
                     MineField.Clicks++;
                     SetImageToButton((ToggleButton)sender, "../Images/MineWithOutlineRed.png");
-
+                    SetImageToButton(Start_Button, "../MinesweeperIcons/smiley3.ico");
                     ((ToggleButton)sender).IsEnabled = false;
                     DoExplosion(((ToggleButton)sender));
                     timer.Stop();
@@ -168,7 +189,7 @@ namespace MineSweeper
             {
                 ClickedCell.IsEnabled = false;
                 MineField.Field[Row, Col].Visited = true;
-                SetImageToButton(ClickedCell, "../MinesweeperIcons/tile.ico");
+                //SetImageToButton(ClickedCell, "../MinesweeperIcons/tile.ico");
                 ExploreTheEmptinessInYou((ToggleButton)FieldGrid.FindName("X" + (Row + 1) + "X" + Col + "X"));
                 ExploreTheEmptinessInYou((ToggleButton)FieldGrid.FindName("X" + Row + "X" + (Col + 1) + "X"));
                 ExploreTheEmptinessInYou((ToggleButton)FieldGrid.FindName("X" + (Row + 1) + "X" + (Col + 1) + "X"));
@@ -178,7 +199,7 @@ namespace MineSweeper
             {
                 ClickedCell.IsEnabled = false;
                 MineField.Field[Row, Col].Visited = true;
-                SetImageToButton(ClickedCell, "../MinesweeperIcons/tile.ico");
+                //SetImageToButton(ClickedCell, "../MinesweeperIcons/tile.ico");
                 ExploreTheEmptinessInYou((ToggleButton)FieldGrid.FindName("X" + (Row + 1) + "X" + Col + "X"));
                 ExploreTheEmptinessInYou((ToggleButton)FieldGrid.FindName("X" + Row + "X" + (Col - 1) + "X"));
                 ExploreTheEmptinessInYou((ToggleButton)FieldGrid.FindName("X" + (Row + 1) + "X" + (Col - 1) + "X"));
@@ -188,7 +209,7 @@ namespace MineSweeper
             {
                 ClickedCell.IsEnabled = false;
                 MineField.Field[Row, Col].Visited = true;
-                SetImageToButton(ClickedCell, "../MinesweeperIcons/tile.ico");
+                //SetImageToButton(ClickedCell, "../MinesweeperIcons/tile.ico");
                 ExploreTheEmptinessInYou((ToggleButton)FieldGrid.FindName("X" + (Row - 1) + "X" + Col + "X"));
                 ExploreTheEmptinessInYou((ToggleButton)FieldGrid.FindName("X" + Row + "X" + (Col + 1) + "X"));
                 ExploreTheEmptinessInYou((ToggleButton)FieldGrid.FindName("X" + (Row - 1) + "X" + (Col + 1) + "X"));
@@ -198,7 +219,7 @@ namespace MineSweeper
             {
                 ClickedCell.IsEnabled = false;
                 MineField.Field[Row, Col].Visited = true;
-                SetImageToButton(ClickedCell, "../MinesweeperIcons/tile.ico");
+                //SetImageToButton(ClickedCell, "../MinesweeperIcons/tile.ico");
                 ExploreTheEmptinessInYou((ToggleButton)FieldGrid.FindName("X" + (Row - 1) + "X" + Col + "X"));
                 ExploreTheEmptinessInYou((ToggleButton)FieldGrid.FindName("X" + Row + "X" + (Col - 1) + "X"));
                 ExploreTheEmptinessInYou((ToggleButton)FieldGrid.FindName("X" + (Row - 1) + "X" + (Col - 1) + "X"));
@@ -208,7 +229,7 @@ namespace MineSweeper
             {
                 ClickedCell.IsEnabled = false;
                 MineField.Field[Row, Col].Visited = true;
-                SetImageToButton(ClickedCell, "../MinesweeperIcons/tile.ico");
+                //SetImageToButton(ClickedCell, "../MinesweeperIcons/tile.ico");
                 ExploreTheEmptinessInYou((ToggleButton)FieldGrid.FindName("X" + Row + "X" + (Col - 1) + "X"));
                 ExploreTheEmptinessInYou((ToggleButton)FieldGrid.FindName("X" + Row + "X" + (Col + 1) + "X"));
                 ExploreTheEmptinessInYou((ToggleButton)FieldGrid.FindName("X" + (Row + 1) + "X" + Col + "X"));
@@ -220,7 +241,7 @@ namespace MineSweeper
             {
                 ClickedCell.IsEnabled = false;
                 MineField.Field[Row, Col].Visited = true;
-                SetImageToButton(ClickedCell, "../MinesweeperIcons/tile.ico");
+                //SetImageToButton(ClickedCell, "../MinesweeperIcons/tile.ico");
                 ExploreTheEmptinessInYou((ToggleButton)FieldGrid.FindName("X" + Row + "X" + (Col - 1) + "X"));
                 ExploreTheEmptinessInYou((ToggleButton)FieldGrid.FindName("X" + Row + "X" + (Col + 1) + "X"));
                 ExploreTheEmptinessInYou((ToggleButton)FieldGrid.FindName("X" + (Row - 1) + "X" + Col + "X"));
@@ -232,7 +253,7 @@ namespace MineSweeper
             {
                 ClickedCell.IsEnabled = false;
                 MineField.Field[Row, Col].Visited = true;
-                SetImageToButton(ClickedCell, "../MinesweeperIcons/tile.ico");
+                //SetImageToButton(ClickedCell, "../MinesweeperIcons/tile.ico");
                 ExploreTheEmptinessInYou((ToggleButton)FieldGrid.FindName("X" + (Row + 1) + "X" + Col + "X"));
                 ExploreTheEmptinessInYou((ToggleButton)FieldGrid.FindName("X" + (Row - 1) + "X" + Col + "X"));
                 ExploreTheEmptinessInYou((ToggleButton)FieldGrid.FindName("X" + Row + "X" + (Col + 1) + "X"));
@@ -244,7 +265,7 @@ namespace MineSweeper
             {
                 ClickedCell.IsEnabled = false;
                 MineField.Field[Row, Col].Visited = true;
-                SetImageToButton(ClickedCell, "../MinesweeperIcons/tile.ico");
+                //SetImageToButton(ClickedCell, "../MinesweeperIcons/tile.ico");
                 ExploreTheEmptinessInYou((ToggleButton)FieldGrid.FindName("X" + (Row + 1) + "X" + Col + "X"));
                 ExploreTheEmptinessInYou((ToggleButton)FieldGrid.FindName("X" + (Row - 1) + "X" + Col + "X"));
                 ExploreTheEmptinessInYou((ToggleButton)FieldGrid.FindName("X" + Row + "X" + (Col - 1) + "X"));
@@ -256,7 +277,7 @@ namespace MineSweeper
             {
                 ClickedCell.IsEnabled = false;
                 MineField.Field[Row, Col].Visited = true;
-                SetImageToButton(ClickedCell, "../MinesweeperIcons/tile.ico");
+                //SetImageToButton(ClickedCell, "../MinesweeperIcons/tile.ico");
                 ExploreTheEmptinessInYou((ToggleButton)FieldGrid.FindName("X" + Row + "X" + (Col + 1) + "X"));
                 ExploreTheEmptinessInYou((ToggleButton)FieldGrid.FindName("X" + Row + "X" + (Col - 1) + "X"));
                 ExploreTheEmptinessInYou((ToggleButton)FieldGrid.FindName("X" + (Row + 1) + "X" + Col + "X"));
@@ -312,25 +333,43 @@ namespace MineSweeper
             {
                 if (int.Parse(Remaining_Value.Text) != 0)
                 {
-                    SetImageToButton((ToggleButton)sender, "../MinesweeperIcons/flagDark.ico");
+                    SetImageToButton((ToggleButton)sender, "../MinesweeperIcons/flag.ico");
                     MineField.Field[Row, Col].Flagged = true;
                     Remaining_Value.Text = (int.Parse(Remaining_Value.Text) - 1).ToString();
                 }
                 else
                 {
-                    Error_Message.Text = "Your out of flags!";
+                    Error_Message.Text = "You're out of flags!";
                 }
             }
             else
             {
-                SetImageToButton((ToggleButton)sender, "../MinesweeperIcons/tileDark.ico");
+                //SetImageToButton((ToggleButton)sender, "../MinesweeperIcons/tileDark.ico");
+                ((ToggleButton)sender).Content = null;
                 MineField.Field[Row, Col].Flagged = false;
                 Remaining_Value.Text = (int.Parse(Remaining_Value.Text) + 1).ToString();
                 Error_Message.Text = "";
             }
         }
 
+        private void ToggleButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            SetImageToButton(Start_Button, "../MinesweeperIcons/smiley2.ico");
+        }
+
+        private void ToggleButton_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            SetImageToButton(Start_Button, "../MinesweeperIcons/smiley1.ico");
+        }
+
         private void SetImageToButton(ToggleButton button, string path)
+        {
+            Image img = new Image();
+            img.Source = new BitmapImage(new Uri(path, UriKind.Relative));
+            button.Content = img;
+        }
+
+        private void SetImageToButton(Button button, string path)
         {
             Image img = new Image();
             img.Source = new BitmapImage(new Uri(path, UriKind.Relative));

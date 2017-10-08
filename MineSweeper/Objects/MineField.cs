@@ -42,20 +42,9 @@ namespace MineSweeper
                     Field[i, j].ColIndex = j;
                 }
             }
-
-            RandomizeMines();
-
-            for (int i = 0; i < Rows; i++)
-            {
-                for (int j = 0; j < Cols; j++)
-                {
-                    CountCellMines(Field[i, j]);
-                }
-            }
-
         }
 
-        public void RandomizeMines()
+        public void RandomizeMines(Cell TheChosenOne)
         {
             Random rand = new Random();
             int RandRow;
@@ -66,7 +55,7 @@ namespace MineSweeper
                 RandRow = rand.Next(0, Rows - 1);
                 RandCol = rand.Next(0, Cols - 1);
 
-                while (Field[RandRow, RandCol].Mine == true)
+                while (Field[RandRow, RandCol].Mine == true || (RandRow == TheChosenOne.RowIndex && RandCol == TheChosenOne.ColIndex))
                 {
                     RandRow = rand.Next(0, Rows);
                     RandCol = rand.Next(0, Cols);
@@ -77,139 +66,142 @@ namespace MineSweeper
 
         }
 
-        public void CountCellMines(Cell cell)
-        {
-            int mines = 0;
-
-            Cell UL = null;         //Up Left
-            Cell U = null;          //Up 
-            Cell UR = null;         //Up Right
-            Cell R = null;          //Right
-            Cell L = null;          
-            Cell DL = null;         
-            Cell D = null;          
-            Cell DR = null;                
-
-            if (cell.RowIndex > 0 && cell.ColIndex > 0)
-            {
-                UL = Field[cell.RowIndex - 1, cell.ColIndex - 1];
-            }
-
-            if (cell.RowIndex > 0)
-            {
-                U = Field[cell.RowIndex - 1, cell.ColIndex];
-            }
-
-            if (cell.RowIndex > 0 && cell.ColIndex < Cols - 1)
-            {
-                UR = Field[cell.RowIndex - 1, cell.ColIndex + 1];
-            }
-
-            if (cell.ColIndex < Cols - 1)
-            {
-                R = Field[cell.RowIndex, cell.ColIndex + 1];
-            }
-
-            if (cell.ColIndex > 0)
-            {
-                L = Field[cell.RowIndex, cell.ColIndex - 1];
-            }
-
-            if (cell.RowIndex < Rows - 1 && cell.ColIndex > 0)
-            {
-                DL = Field[cell.RowIndex + 1, cell.ColIndex - 1];
-            }
-
-            if (cell.RowIndex < Rows - 1)
-            {
-                D = Field[cell.RowIndex + 1, cell.ColIndex];
-            }
-
-            if (cell.RowIndex < Rows - 1 && cell.ColIndex < Cols - 1)
-            {
-                DR = Field[cell.RowIndex + 1, cell.ColIndex + 1];
-            }
-
-            if (UL != null && UL.Mine)
-            {
-                mines++;
-            }
-
-            if (U != null && U.Mine)
-            {
-                mines++;
-            }
-
-            if (UR != null && UR.Mine)
-            {
-                mines++;
-            }
-
-            if (R != null && R.Mine)
-            {
-                mines++;
-            }
-
-            if (L != null && L.Mine)
-            {
-                mines++;
-            }
-
-            if (DL != null && DL.Mine)
-            {
-                mines++;
-            }
-
-            if (DR != null && DR.Mine)
-            {
-                mines++;
-            }
-
-            if (D != null && D.Mine)
-            {
-                mines++;
-            }
-
-            cell.MinesAround = mines;
-
-            switch (mines)
-            {
-                case 1:
-                    cell.Icon = "../Images/Numbers/Number-1-icon.png";
-                    break;
-                case 2:
-                    cell.Icon = "../Images/Numbers/Number-2-icon.png";
-                    break;
-                case 3:
-                    cell.Icon = "../Images/Numbers/Number-3-icon.png";
-                    break;
-                case 4:
-                    cell.Icon = "../Images/Numbers/Number-4-icon.png";
-                    break;
-                case 5:
-                    cell.Icon = "../Images/Numbers/Number-5-icon.png";
-                    break;
-                case 6:
-                    cell.Icon = "../Images/Numbers/Number-6-icon.png";
-                    break;
-                case 7:
-                    cell.Icon = "../Images/Numbers/Number-7-icon.png";
-                    break;
-                case 8:
-                    cell.Icon = "../Images/Numbers/Number-8-icon.png";
-                    break;
-                case 9:
-                    cell.Icon = "../Images/Numbers/Number-9-icon.png";
-                    break;
-                default:
-                    cell.Icon = "";
-                    break;
-            }
-        }
-
-        public void CalculateScore()
+        public void CountCellMines()
         {
 
+            for (int i = 0; i < Rows; i++)
+            {
+                for (int j = 0; j < Cols; j++)
+                {
+                    int mines = 0;
+
+                    Cell UL = null;         //Up Left
+                    Cell U = null;          //Up 
+                    Cell UR = null;         //Up Right
+                    Cell R = null;          //Right
+                    Cell L = null;
+                    Cell DL = null;
+                    Cell D = null;
+                    Cell DR = null;
+
+                    if (i > 0 && j > 0)
+                    {
+                        UL = Field[i - 1, j - 1];
+                    }
+
+                    if (i > 0)
+                    {
+                        U = Field[i - 1, j];
+                    }
+
+                    if (i > 0 && j < Cols - 1)
+                    {
+                        UR = Field[i - 1, j + 1];
+                    }
+
+                    if (j < Cols - 1)
+                    {
+                        R = Field[i, j + 1];
+                    }
+
+                    if (j > 0)
+                    {
+                        L = Field[i, j - 1];
+                    }
+
+                    if (i < Rows - 1 && j > 0)
+                    {
+                        DL = Field[i + 1, j - 1];
+                    }
+
+                    if (i < Rows - 1)
+                    {
+                        D = Field[i + 1, j];
+                    }
+
+                    if (i < Rows - 1 && j < Cols - 1)
+                    {
+                        DR = Field[i + 1, j + 1];
+                    }
+
+
+                    if (UL != null && UL.Mine)
+                    {
+                        mines++;
+                    }
+
+                    if (U != null && U.Mine)
+                    {
+                        mines++;
+                    }
+
+                    if (UR != null && UR.Mine)
+                    {
+                        mines++;
+                    }
+
+                    if (R != null && R.Mine)
+                    {
+                        mines++;
+                    }
+
+                    if (L != null && L.Mine)
+                    {
+                        mines++;
+                    }
+
+                    if (DL != null && DL.Mine)
+                    {
+                        mines++;
+                    }
+
+                    if (DR != null && DR.Mine)
+                    {
+                        mines++;
+                    }
+
+                    if (D != null && D.Mine)
+                    {
+                        mines++;
+                    }
+
+                    Field[i,j].MinesAround = mines;
+
+                    switch (mines)
+                    {
+                        case 1:
+                            Field[i, j].Icon = "../Images/Numbers/Number-1-icon.png";
+                            break;
+                        case 2:
+                            Field[i, j].Icon = "../Images/Numbers/Number-2-icon.png";
+                            break;
+                        case 3:
+                            Field[i, j].Icon = "../Images/Numbers/Number-3-icon.png";
+                            break;
+                        case 4:
+                            Field[i, j].Icon = "../Images/Numbers/Number-4-icon.png";
+                            break;
+                        case 5:
+                            Field[i, j].Icon = "../Images/Numbers/Number-5-icon.png";
+                            break;
+                        case 6:
+                            Field[i, j].Icon = "../Images/Numbers/Number-6-icon.png";
+                            break;
+                        case 7:
+                            Field[i, j].Icon = "../Images/Numbers/Number-7-icon.png";
+                            break;
+                        case 8:
+                            Field[i, j].Icon = "../Images/Numbers/Number-8-icon.png";
+                            break;
+                        case 9:
+                            Field[i, j].Icon = "../Images/Numbers/Number-9-icon.png";
+                            break;
+                        default:
+                            Field[i, j].Icon = "";
+                            break;
+                    }
+                }
+            }
         }
     }
 }
