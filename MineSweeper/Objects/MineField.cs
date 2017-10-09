@@ -66,6 +66,28 @@ namespace MineSweeper
 
         }
 
+        public void RandomizeMines()
+        {
+            Random rand = new Random();
+            int RandRow;
+            int RandCol;
+
+            for (int i = 0; i < Mines; i++)
+            {
+                RandRow = rand.Next(0, Rows - 1);
+                RandCol = rand.Next(0, Cols - 1);
+
+                while (Field[RandRow, RandCol].Mine == true)
+                {
+                    RandRow = rand.Next(0, Rows);
+                    RandCol = rand.Next(0, Cols);
+                }
+
+                Field[RandRow, RandCol].Mine = true;
+            }
+
+        }
+
         public void CountCellMines()
         {
 
